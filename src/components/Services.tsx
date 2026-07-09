@@ -135,23 +135,23 @@ function TreatmentPanel({ card, panelRef }: { card: CardConfig; panelRef: (el: H
       className={`${PANEL_WIDTH} flex-shrink-0 snap-center rounded-3xl border border-gray-100 shadow-sm bg-white overflow-hidden flex flex-col min-h-[540px] sm:min-h-[500px]`}
     >
       <div className="flex-shrink-0">
-        <div className="relative aspect-[27/10] overflow-hidden bg-[#FDF0F7]">
+        <div className="relative bg-[#FDF0F7]">
           <img
             src={card.photos.before}
             alt={`${card.photos.alt} sebelum`}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="block w-full h-auto"
           />
           <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-2 py-1 rounded-full">
             Sebelum
           </span>
         </div>
-        <div className="relative aspect-[27/10] overflow-hidden bg-[#FDF0F7]">
+        <div className="relative bg-[#FDF0F7]">
           <img
             src={card.photos.after}
             alt={`${card.photos.alt} selepas`}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="block w-full h-auto"
           />
           <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-[#E23E8F] text-white px-2 py-1 rounded-full">
             Selepas
@@ -215,40 +215,57 @@ function PriceCarousel() {
   const panelRefs = useRef<(HTMLDivElement | null)[]>([])
   const [activeIndex, setActiveIndex] = useState(0)
 
+  // Single source of truth: the panel whose center is nearest the track's
+  // center is the active one. Used identically by scroll detection and by
+  // programmatic scrolling, so arrows, dots and pills never disagree.
+  const nearestIndexToCenter = useCallback(() => {
+    const track = trackRef.current
+    if (!track) return 0
+    const trackRect = track.getBoundingClientRect()
+    const trackCenter = trackRect.left + trackRect.width / 2
+    let best = 0
+    let bestDist = Infinity
+    panelRefs.current.forEach((panel, i) => {
+      if (!panel) return
+      const r = panel.getBoundingClientRect()
+      const dist = Math.abs(r.left + r.width / 2 - trackCenter)
+      if (dist < bestDist) {
+        bestDist = dist
+        best = i
+      }
+    })
+    return best
+  }, [])
+
   const scrollToIndex = useCallback((index: number) => {
+    const track = trackRef.current
     const panel = panelRefs.current[index]
-    if (!panel) return
-    panel.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    if (!track || !panel) return
+    const trackRect = track.getBoundingClientRect()
+    const panelRect = panel.getBoundingClientRect()
+    const delta = panelRect.left + panelRect.width / 2 - (trackRect.left + trackRect.width / 2)
+    track.scrollBy({ left: delta, behavior: 'smooth' })
+    // Optimistic: reflect the intent immediately; the scroll listener confirms.
+    setActiveIndex(index)
   }, [])
 
   useEffect(() => {
     const track = trackRef.current
     if (!track) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        let best: { index: number; ratio: number } | null = null
-        entries.forEach((entry) => {
-          const key = (entry.target as HTMLElement).dataset.panelKey
-          const index = cards.findIndex((c) => c.key === key)
-          if (index === -1) return
-          if (!best || entry.intersectionRatio > best.ratio) {
-            best = { index, ratio: entry.intersectionRatio }
-          }
-        })
-        if (best && best.ratio > 0.4) {
-          setActiveIndex(best.index)
-        }
-      },
-      { root: track, threshold: [0.25, 0.5, 0.6, 0.75, 0.9] }
-    )
-
-    panelRefs.current.forEach((panel) => {
-      if (panel) observer.observe(panel)
-    })
-
-    return () => observer.disconnect()
-  }, [])
+    let raf = 0
+    const sync = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => setActiveIndex(nearestIndexToCenter()))
+    }
+    track.addEventListener('scroll', sync, { passive: true })
+    window.addEventListener('resize', sync)
+    sync()
+    return () => {
+      track.removeEventListener('scroll', sync)
+      window.removeEventListener('resize', sync)
+      cancelAnimationFrame(raf)
+    }
+  }, [nearestIndexToCenter])
 
   const goPrev = () => scrollToIndex(Math.max(0, activeIndex - 1))
   const goNext = () => scrollToIndex(Math.min(cards.length - 1, activeIndex + 1))
