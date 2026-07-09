@@ -24,7 +24,16 @@ import crownAfter from '../assets/pricing/crown-after.jpg'
 const WA_NUMBER = '60122412034'
 const waLink = (msg: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`
 
-type CardPhotos = { before: string; after: string; alt: string }
+type PhotoDims = { w: number; h: number }
+// Natural jpg dimensions so the browser reserves each image box before the
+// lazy image loads (prevents layout shift while scrolling).
+type CardPhotos = {
+  before: string
+  beforeDims: PhotoDims
+  after: string
+  afterDims: PhotoDims
+  alt: string
+}
 
 type CardConfig = {
   key: string
@@ -45,7 +54,9 @@ const cards: CardConfig[] = [
     highlight: 'Dari RM150/bulan',
     photos: {
       before: bracesBefore,
+      beforeDims: { w: 893, h: 315 },
       after: bracesAfter,
+      afterDims: { w: 922, h: 441 },
       alt: 'Braces',
     },
     rows: [
@@ -61,7 +72,9 @@ const cards: CardConfig[] = [
     title: 'Teeth Whitening',
     photos: {
       before: whiteningBefore,
+      beforeDims: { w: 434, h: 140 },
       after: whiteningAfter,
+      afterDims: { w: 448, h: 197 },
       alt: 'Teeth whitening',
     },
     rows: [
@@ -78,7 +91,9 @@ const cards: CardConfig[] = [
     title: 'Veneers',
     photos: {
       before: veneerBefore,
+      beforeDims: { w: 437, h: 149 },
       after: veneerAfter,
+      afterDims: { w: 451, h: 193 },
       alt: 'Veneer',
     },
     rows: [
@@ -94,7 +109,9 @@ const cards: CardConfig[] = [
     title: 'Zirconia Crowns & Bridges Onlay',
     photos: {
       before: crownBefore,
+      beforeDims: { w: 435, h: 159 },
       after: crownAfter,
+      afterDims: { w: 442, h: 202 },
       alt: 'Crown gigi',
     },
     rows: [
@@ -111,7 +128,9 @@ const cards: CardConfig[] = [
     title: 'Scaling & Rawatan Asas',
     photos: {
       before: scalingBefore,
+      beforeDims: { w: 447, h: 159 },
       after: scalingAfter,
+      afterDims: { w: 454, h: 187 },
       alt: 'Scaling',
     },
     rows: [
@@ -139,6 +158,8 @@ function TreatmentPanel({ card, panelRef }: { card: CardConfig; panelRef: (el: H
           <img
             src={card.photos.before}
             alt={`${card.photos.alt} sebelum`}
+            width={card.photos.beforeDims.w}
+            height={card.photos.beforeDims.h}
             loading="lazy"
             className="block w-full h-auto"
           />
@@ -150,6 +171,8 @@ function TreatmentPanel({ card, panelRef }: { card: CardConfig; panelRef: (el: H
           <img
             src={card.photos.after}
             alt={`${card.photos.alt} selepas`}
+            width={card.photos.afterDims.w}
+            height={card.photos.afterDims.h}
             loading="lazy"
             className="block w-full h-auto"
           />

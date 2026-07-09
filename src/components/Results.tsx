@@ -8,11 +8,13 @@ import scalingImg from '../assets/results-scaling.png'
 const WA_LINK = 'https://wa.me/60122412034'
 
 // Real before/after photos supplied by the clinic (already branded by them).
+// w/h are the natural png dimensions so the browser reserves each image box
+// before the lazy image loads (prevents layout shift while scrolling).
 const results = [
-  { img: bracesImg, label: 'Braces in Progress' },
-  { img: whiteningImg, label: 'Teeth Whitening' },
-  { img: veneerImg, label: 'Zirconia Veneers' },
-  { img: scalingImg, label: 'Deep Scaling' },
+  { img: bracesImg, w: 701, h: 875, label: 'Braces in Progress' },
+  { img: whiteningImg, w: 700, h: 877, label: 'Teeth Whitening' },
+  { img: veneerImg, w: 705, h: 879, label: 'Zirconia Veneers' },
+  { img: scalingImg, w: 710, h: 814, label: 'Deep Scaling' },
 ]
 
 export default function Results() {
@@ -49,6 +51,8 @@ export default function Results() {
               <img
                 src={r.img}
                 alt={`${r.label} before and after at Klinik Pergigian Dr Hawa`}
+                width={r.w}
+                height={r.h}
                 loading="lazy"
                 className="w-full h-auto block"
               />
