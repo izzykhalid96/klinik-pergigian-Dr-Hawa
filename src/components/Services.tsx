@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
-import { MessageCircle, ChevronDown, Tag } from 'lucide-react'
+import { MessageCircle, ChevronDown, ChevronLeft, ChevronRight, Tag } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   promos,
   bracesFull,
@@ -27,24 +28,25 @@ type CardPhotos = { before: string; after: string; alt: string }
 
 type CardConfig = {
   key: string
+  tabLabel: string
   title: string
   highlight?: string
-  photos?: CardPhotos
+  photos: CardPhotos
   rows: PriceRow[]
   note?: string
   waMsg: string
-  span?: string
 }
 
 const cards: CardConfig[] = [
   {
     key: 'braces',
+    tabLabel: 'Braces',
     title: 'Braces & Orthodontics',
     highlight: 'Dari RM150/bulan',
     photos: {
       before: bracesBefore,
       after: bracesAfter,
-      alt: 'Braces in progress',
+      alt: 'Braces',
     },
     rows: [
       { label: 'Conventional (pelajar RM3,999 / biasa RM4,500)', price: 'RM150/bulan' },
@@ -52,10 +54,10 @@ const cards: CardConfig[] = [
       { label: 'Damon Self-Ligating (dari RM6,900)', price: 'RM250/bulan' },
     ],
     waMsg: 'Hi, saya nak tanya pasal pakej braces.',
-    span: 'sm:col-span-2 lg:col-span-2',
   },
   {
     key: 'whitening',
+    tabLabel: 'Whitening',
     title: 'Teeth Whitening',
     photos: {
       before: whiteningBefore,
@@ -72,11 +74,12 @@ const cards: CardConfig[] = [
   },
   {
     key: 'veneer',
+    tabLabel: 'Veneer',
     title: 'Veneers',
     photos: {
       before: veneerBefore,
       after: veneerAfter,
-      alt: 'Veneer zirconia',
+      alt: 'Veneer',
     },
     rows: [
       { label: 'Composite', price: 'RM300 - RM350/unit' },
@@ -87,11 +90,12 @@ const cards: CardConfig[] = [
   },
   {
     key: 'crown',
+    tabLabel: 'Crown',
     title: 'Zirconia Crowns & Bridges Onlay',
     photos: {
       before: crownBefore,
       after: crownAfter,
-      alt: 'Zirconia crown',
+      alt: 'Crown gigi',
     },
     rows: [
       { label: 'Porcelain', price: 'RM1,200/unit' },
@@ -103,11 +107,12 @@ const cards: CardConfig[] = [
   },
   {
     key: 'scaling',
+    tabLabel: 'Rawatan Asas',
     title: 'Scaling & Rawatan Asas',
     photos: {
       before: scalingBefore,
       after: scalingAfter,
-      alt: 'Deep scaling',
+      alt: 'Scaling',
     },
     rows: [
       { label: 'Scaling', price: 'Dari RM120' },
@@ -119,41 +124,40 @@ const cards: CardConfig[] = [
   },
 ]
 
-function TreatmentCard({ card, delay }: { card: CardConfig; delay: number }) {
+const PANEL_WIDTH = 'w-[90%] sm:w-[85%] md:w-[74%] lg:w-[72%]'
+const TRACK_PADDING = 'px-[5%] sm:px-[7.5%] md:px-[13%] lg:px-[14%]'
+
+function TreatmentPanel({ card, panelRef }: { card: CardConfig; panelRef: (el: HTMLDivElement | null) => void }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
-      className={`rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-[#E23E8F]/10 hover:-translate-y-1 transition-all duration-200 overflow-hidden bg-white flex flex-col ${card.span ?? ''}`}
+    <div
+      ref={panelRef}
+      data-panel-key={card.key}
+      className={`${PANEL_WIDTH} flex-shrink-0 snap-center rounded-3xl border border-gray-100 shadow-sm bg-white overflow-hidden flex flex-col min-h-[540px] sm:min-h-[500px]`}
     >
-      {card.photos && (
-        <div className="flex-shrink-0">
-          <div className="relative h-24 sm:h-28 overflow-hidden">
-            <img
-              src={card.photos.before}
-              alt={`${card.photos.alt} sebelum`}
-              loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-2 py-1 rounded-full">
-              Sebelum
-            </span>
-          </div>
-          <div className="relative h-24 sm:h-28 overflow-hidden">
-            <img
-              src={card.photos.after}
-              alt={`${card.photos.alt} selepas`}
-              loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-[#E23E8F] text-white px-2 py-1 rounded-full">
-              Selepas
-            </span>
-          </div>
+      <div className="flex-shrink-0">
+        <div className="relative aspect-[27/10] overflow-hidden bg-[#FDF0F7]">
+          <img
+            src={card.photos.before}
+            alt={`${card.photos.alt} sebelum`}
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-2 py-1 rounded-full">
+            Sebelum
+          </span>
         </div>
-      )}
+        <div className="relative aspect-[27/10] overflow-hidden bg-[#FDF0F7]">
+          <img
+            src={card.photos.after}
+            alt={`${card.photos.alt} selepas`}
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-[#E23E8F] text-white px-2 py-1 rounded-full">
+            Selepas
+          </span>
+        </div>
+      </div>
 
       <div className="p-6 sm:p-7 flex flex-col gap-4 flex-1">
         <h3 className="text-lg font-bold text-[#1A1A2E]">{card.title}</h3>
@@ -186,7 +190,7 @@ function TreatmentCard({ card, delay }: { card: CardConfig; delay: number }) {
           WhatsApp Kami
         </a>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -202,6 +206,124 @@ function PriceTable({ title, rows }: { title: string; rows: PriceRow[] }) {
           </li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+function PriceCarousel() {
+  const trackRef = useRef<HTMLDivElement | null>(null)
+  const panelRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  const scrollToIndex = useCallback((index: number) => {
+    const panel = panelRefs.current[index]
+    if (!panel) return
+    panel.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+  }, [])
+
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let best: { index: number; ratio: number } | null = null
+        entries.forEach((entry) => {
+          const key = (entry.target as HTMLElement).dataset.panelKey
+          const index = cards.findIndex((c) => c.key === key)
+          if (index === -1) return
+          if (!best || entry.intersectionRatio > best.ratio) {
+            best = { index, ratio: entry.intersectionRatio }
+          }
+        })
+        if (best && best.ratio > 0.4) {
+          setActiveIndex(best.index)
+        }
+      },
+      { root: track, threshold: [0.25, 0.5, 0.6, 0.75, 0.9] }
+    )
+
+    panelRefs.current.forEach((panel) => {
+      if (panel) observer.observe(panel)
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  const goPrev = () => scrollToIndex(Math.max(0, activeIndex - 1))
+  const goNext = () => scrollToIndex(Math.min(cards.length - 1, activeIndex + 1))
+
+  return (
+    <div>
+      {/* Tab pills */}
+      <div className="flex flex-wrap justify-center gap-2 mb-8">
+        {cards.map((c, i) => (
+          <button
+            key={c.key}
+            type="button"
+            onClick={() => scrollToIndex(i)}
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors border ${
+              activeIndex === i
+                ? 'bg-[#E23E8F] text-white border-[#E23E8F]'
+                : 'bg-white text-[#1A1A2E] border-gray-200 hover:border-[#E23E8F]/50 hover:text-[#E23E8F]'
+            }`}
+          >
+            {c.tabLabel}
+          </button>
+        ))}
+      </div>
+
+      {/* Carousel */}
+      <div className="relative">
+        <button
+          type="button"
+          aria-label="Sebelumnya"
+          onClick={goPrev}
+          disabled={activeIndex === 0}
+          className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 w-11 h-11 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-[#1A1A2E] hover:text-[#E23E8F] disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <button
+          type="button"
+          aria-label="Seterusnya"
+          onClick={goNext}
+          disabled={activeIndex === cards.length - 1}
+          className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 w-11 h-11 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 text-[#1A1A2E] hover:text-[#E23E8F] disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+        >
+          <ChevronRight size={20} />
+        </button>
+
+        <div
+          ref={trackRef}
+          className={`carousel-track flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide ${TRACK_PADDING} pb-2`}
+        >
+          {cards.map((c, i) => (
+            <TreatmentPanel
+              key={c.key}
+              card={c}
+              panelRef={(el) => {
+                panelRefs.current[i] = el
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Dots */}
+      <div className="flex justify-center gap-2 mt-6">
+        {cards.map((c, i) => (
+          <button
+            key={c.key}
+            type="button"
+            aria-label={`Pergi ke ${c.tabLabel}`}
+            onClick={() => scrollToIndex(i)}
+            className={`h-2 rounded-full transition-all ${
+              activeIndex === i ? 'w-6 bg-[#E23E8F]' : 'w-2 bg-gray-200 hover:bg-gray-300'
+            }`}
+          />
+        ))}
+      </div>
     </div>
   )
 }
@@ -237,7 +359,7 @@ export default function Services() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-14"
+          className="text-center mb-10"
         >
           <span className="text-[#E23E8F] text-sm font-semibold uppercase tracking-widest">Senarai Harga</span>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#1A1A2E] mt-3 mb-4">
@@ -249,11 +371,7 @@ export default function Services() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cards.map((c, i) => (
-            <TreatmentCard key={c.key} card={c} delay={i * 0.08} />
-          ))}
-        </div>
+        <PriceCarousel />
 
         {/* Full price list */}
         <motion.details
