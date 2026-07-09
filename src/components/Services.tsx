@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { Shield, MessageCircle, ChevronDown, Tag } from 'lucide-react'
+import { MessageCircle, ChevronDown, Tag } from 'lucide-react'
 import {
   promos,
   bracesFull,
@@ -9,14 +9,16 @@ import {
   scalingFull,
   type PriceRow,
 } from '../data/pricing'
-import damonBefore from '../assets/pricing/damon-braces-before.jpg'
-import damonAfter from '../assets/pricing/damon-braces-after.jpg'
-import debondBefore from '../assets/pricing/debond-braces-before.jpg'
-import debondAfter from '../assets/pricing/debond-braces-after.jpg'
-import veneerBefore from '../assets/pricing/veneer-zirconia-before.jpg'
-import veneerAfter from '../assets/pricing/veneer-zirconia-after.jpg'
-import scalingBefore from '../assets/pricing/deep-scaling-before.jpg'
-import scalingAfter from '../assets/pricing/deep-scaling-after.jpg'
+import bracesBefore from '../assets/pricing/damon-braces-before.jpg'
+import bracesAfter from '../assets/pricing/damon-braces-after.jpg'
+import whiteningBefore from '../assets/pricing/whitening-before.jpg'
+import whiteningAfter from '../assets/pricing/whitening-after.jpg'
+import veneerBefore from '../assets/pricing/veneer2-before.jpg'
+import veneerAfter from '../assets/pricing/veneer2-after.jpg'
+import scalingBefore from '../assets/pricing/scaling2-before.jpg'
+import scalingAfter from '../assets/pricing/scaling2-after.jpg'
+import crownBefore from '../assets/pricing/crown-before.jpg'
+import crownAfter from '../assets/pricing/crown-after.jpg'
 
 const WA_NUMBER = '60122412034'
 const waLink = (msg: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`
@@ -40,9 +42,9 @@ const cards: CardConfig[] = [
     title: 'Braces & Orthodontics',
     highlight: 'Dari RM150/bulan',
     photos: {
-      before: damonBefore,
-      after: damonAfter,
-      alt: 'Braces Damon Self-Ligating',
+      before: bracesBefore,
+      after: bracesAfter,
+      alt: 'Braces in progress',
     },
     rows: [
       { label: 'Conventional (pelajar RM3,999 / biasa RM4,500)', price: 'RM150/bulan' },
@@ -56,9 +58,9 @@ const cards: CardConfig[] = [
     key: 'whitening',
     title: 'Teeth Whitening',
     photos: {
-      before: debondBefore,
-      after: debondAfter,
-      alt: 'Senyuman selepas rawatan',
+      before: whiteningBefore,
+      after: whiteningAfter,
+      alt: 'Teeth whitening',
     },
     rows: [
       { label: 'Express (1 cycle)', price: 'RM299' },
@@ -85,7 +87,12 @@ const cards: CardConfig[] = [
   },
   {
     key: 'crown',
-    title: 'Zirconia Crowns & Bridges',
+    title: 'Zirconia Crowns & Bridges Onlay',
+    photos: {
+      before: crownBefore,
+      after: crownAfter,
+      alt: 'Zirconia crown',
+    },
     rows: [
       { label: 'Porcelain', price: 'RM1,200/unit' },
       { label: 'Zirconia', price: 'RM1,200/unit' },
@@ -121,34 +128,30 @@ function TreatmentCard({ card, delay }: { card: CardConfig; delay: number }) {
       transition={{ duration: 0.5, delay }}
       className={`rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-[#E23E8F]/10 hover:-translate-y-1 transition-all duration-200 overflow-hidden bg-white flex flex-col ${card.span ?? ''}`}
     >
-      {card.photos ? (
-        <div className="grid grid-cols-2 h-40 sm:h-48">
-          <div className="relative">
+      {card.photos && (
+        <div className="flex-shrink-0">
+          <div className="relative h-24 sm:h-28 overflow-hidden">
             <img
               src={card.photos.before}
               alt={`${card.photos.alt} sebelum`}
               loading="lazy"
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
             <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-2 py-1 rounded-full">
               Sebelum
             </span>
           </div>
-          <div className="relative">
+          <div className="relative h-24 sm:h-28 overflow-hidden">
             <img
               src={card.photos.after}
               alt={`${card.photos.alt} selepas`}
               loading="lazy"
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
             <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-[#E23E8F] text-white px-2 py-1 rounded-full">
               Selepas
             </span>
           </div>
-        </div>
-      ) : (
-        <div className="h-24 sm:h-28 flex items-center justify-center bg-[#FDF0F7]">
-          <Shield size={34} className="text-[#E23E8F]" />
         </div>
       )}
 
