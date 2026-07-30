@@ -2,9 +2,13 @@ import { motion, AnimatePresence } from 'motion/react'
 import { MessageCircle, ChevronDown, Star, MapPin, Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { reviews } from '../data/reviews'
-import heroPhoto from '../assets/hero.png'
-import checkupPhoto from '../assets/checkup-in-progress.png'
-import waitingRoomPhoto from '../assets/interior-waiting-room.png'
+import { combinedReviews, overallRating } from '../data/stats'
+// Real premises photos, owner-uploaded to the clinic's Google Business Profile.
+// MAB/KKM rules forbid AI-generated patients, staff or premises, so these must
+// stay real — do not swap in stock or generated imagery.
+import storefrontPhoto from '../assets/clinic-storefront.jpg'
+import receptionPhoto from '../assets/clinic-reception.jpg'
+import waitingAreaPhoto from '../assets/clinic-waiting-area.jpg'
 
 const WA_LINK = 'https://wa.me/60122412034'
 
@@ -13,39 +17,51 @@ const vp = { once: true, amount: 0.1 }
 // Doubled so the marquee can loop seamlessly (translateX -50%).
 const marqueeReviews = [...reviews, ...reviews]
 
-const HERO_IMAGES = [heroPhoto, checkupPhoto, waitingRoomPhoto]
+// These are tall phone photos. They live in a fixed 4:3 frame rather than as a
+// full-bleed background, because a portrait source in a landscape hero crops
+// away roughly two thirds of the image.
+const CLINIC_PHOTOS = [
+  { src: storefrontPhoto, alt: 'Pintu masuk Klinik Pergigian Dr Hawa, Bandar Baru Nilai' },
+  { src: receptionPhoto, alt: 'Kaunter penerimaan Klinik Pergigian Dr Hawa' },
+  { src: waitingAreaPhoto, alt: 'Ruang menunggu Klinik Pergigian Dr Hawa' },
+]
 const BASE = '#42112D' // deep berry — drives the overlay, matches the pink brand
 
-export default function Hero() {
+/** Rotating framed photo of the clinic. Shared by the mobile block and the desktop card. */
+function ClinicPhotoFrame({ className = '' }: { className?: string }) {
   const [index, setIndex] = useState(0)
   useEffect(() => {
-    const id = setInterval(() => setIndex((i) => (i + 1) % HERO_IMAGES.length), 5000)
+    const id = setInterval(() => setIndex((i) => (i + 1) % CLINIC_PHOTOS.length), 5000)
     return () => clearInterval(id)
   }, [])
 
-  const desktopGradient = `linear-gradient(105deg, ${BASE}F0 0%, ${BASE}D9 38%, ${BASE}4D 72%, ${BASE}8C 100%)`
-  const mobileGradient = `linear-gradient(180deg, ${BASE}F0 0%, ${BASE}8C 48%, ${BASE}E6 100%)`
-
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex flex-col justify-center pt-24 pb-10 overflow-hidden"
-      style={{ backgroundColor: BASE }}
-    >
+    <div className={`relative aspect-[3/2] lg:aspect-[16/10] overflow-hidden bg-[#2E0C1F] ${className}`}>
       <AnimatePresence mode="sync">
         <motion.img
           key={index}
-          src={HERO_IMAGES[index]}
-          alt="Klinik Pergigian Dr Hawa dental clinic"
+          src={CLINIC_PHOTOS[index].src}
+          alt={CLINIC_PHOTOS[index].alt}
           initial={{ opacity: 0, scale: 1 }}
-          animate={{ opacity: 1, scale: 1.08 }}
+          animate={{ opacity: 1, scale: 1.06 }}
           exit={{ opacity: 0 }}
           transition={{ opacity: { duration: 1 }, scale: { duration: 5, ease: 'linear' } }}
           className="absolute inset-0 w-full h-full object-cover"
         />
       </AnimatePresence>
-      <div className="absolute inset-0 sm:hidden" style={{ background: mobileGradient }} />
-      <div className="absolute inset-0 hidden sm:block" style={{ background: desktopGradient }} />
+    </div>
+  )
+}
+
+export default function Hero() {
+  const backdrop = `radial-gradient(120% 90% at 78% 18%, #6B1D48 0%, ${BASE} 55%, #300B20 100%)`
+
+  return (
+    <section
+      id="hero"
+      className="relative min-h-screen flex flex-col justify-center pt-24 pb-10 overflow-hidden"
+      style={{ background: backdrop }}
+    >
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-10 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -82,9 +98,20 @@ export default function Hero() {
               className="text-lg text-white/80 leading-relaxed mb-10 max-w-lg"
             >
               Braces with zero deposit, whitening, crowns and gentle everyday
-              dentistry. Rated 4.9 stars by more than 400 patients across our
-              Nilai and Shah Alam branches.
+              dentistry. Rated {overallRating} stars by {combinedReviews} patients
+              across our Nilai and Shah Alam branches.
             </motion.p>
+
+            {/* Mobile only — the desktop card carries this same photo frame. */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={vp}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="lg:hidden mb-10"
+            >
+              <ClinicPhotoFrame className="rounded-3xl border border-white/15 shadow-xl" />
+            </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -119,8 +146,8 @@ export default function Hero() {
               className="flex flex-wrap gap-8"
             >
               {[
-                { stat: '4.9★', label: 'Google Rated' },
-                { stat: '410+', label: 'Patient Reviews' },
+                { stat: `${overallRating}★`, label: 'Google Rated' },
+                { stat: `${combinedReviews}`, label: 'Patient Reviews' },
                 { stat: '2', label: 'Branches to Serve You' },
               ].map((item) => (
                 <div key={item.label}>
@@ -139,24 +166,28 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.15 }}
             className="hidden lg:block"
           >
-            <div className="relative rounded-3xl bg-white shadow-xl shadow-[#E23E8F]/10 border border-[#E23E8F]/10 p-8">
-              <div className="absolute -top-4 -right-4 bg-[#E23E8F] text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-lg">
+            <div className="relative rounded-3xl bg-white shadow-xl shadow-[#E23E8F]/10 border border-[#E23E8F]/10 overflow-hidden">
+              <div className="absolute top-4 right-4 z-10 bg-[#E23E8F] text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-lg">
                 Zero Deposit Braces
               </div>
 
+              <ClinicPhotoFrame />
+
               {/* Rating block */}
-              <div className="text-center pb-7 border-b border-gray-100">
-                <div className="text-5xl font-extrabold text-[#1A1A2E]">4.9</div>
-                <div className="flex items-center justify-center gap-1 mt-2">
+              <div className="text-center px-8 pt-5 pb-5 border-b border-gray-100">
+                <div className="text-4xl font-extrabold text-[#1A1A2E]">{overallRating}</div>
+                <div className="flex items-center justify-center gap-1 mt-1.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={18} className="fill-yellow-400 text-yellow-400" />
+                    <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <div className="text-sm text-gray-500 mt-2">Rated by 329 patients on Google</div>
+                <div className="text-sm text-gray-500 mt-1.5">
+                  Rated by {combinedReviews} patients across both branches
+                </div>
               </div>
 
               {/* Quick info */}
-              <div className="space-y-4 pt-7">
+              <div className="space-y-3.5 px-8 pt-5">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-xl bg-[#FDF0F7] flex items-center justify-center flex-shrink-0">
                     <MapPin size={18} className="text-[#E23E8F]" />
@@ -190,7 +221,7 @@ export default function Hero() {
                 href={WA_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-7 flex items-center justify-center gap-2 w-full bg-[#E23E8F] hover:bg-[#C82D79] text-white font-semibold py-3.5 rounded-full text-sm transition-colors"
+                className="mx-8 mt-5 mb-6 flex items-center justify-center gap-2 bg-[#E23E8F] hover:bg-[#C82D79] text-white font-semibold py-3.5 rounded-full text-sm transition-colors"
               >
                 <MessageCircle size={18} />
                 WhatsApp Us to Book

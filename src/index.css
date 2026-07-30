@@ -63,3 +63,9 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/* rigid sides: kill sideways scroll/wobble from motion x-offsets */
+html,
+body {
+  overflow-x: hidden;
+}

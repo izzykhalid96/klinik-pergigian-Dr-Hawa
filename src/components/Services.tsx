@@ -10,37 +10,16 @@ import {
   scalingFull,
   type PriceRow,
 } from '../data/pricing'
-import bracesBefore from '../assets/pricing/damon-braces-before.jpg'
-import bracesAfter from '../assets/pricing/damon-braces-after.jpg'
-import whiteningBefore from '../assets/pricing/whitening-before.jpg'
-import whiteningAfter from '../assets/pricing/whitening-after.jpg'
-import veneerBefore from '../assets/pricing/veneer2-before.jpg'
-import veneerAfter from '../assets/pricing/veneer2-after.jpg'
-import scalingBefore from '../assets/pricing/scaling2-before.jpg'
-import scalingAfter from '../assets/pricing/scaling2-after.jpg'
-import crownBefore from '../assets/pricing/crown-before.jpg'
-import crownAfter from '../assets/pricing/crown-after.jpg'
-
 const WA_NUMBER = '60122412034'
 const waLink = (msg: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`
 
-type PhotoDims = { w: number; h: number }
-// Natural jpg dimensions so the browser reserves each image box before the
-// lazy image loads (prevents layout shift while scrolling).
-type CardPhotos = {
-  before: string
-  beforeDims: PhotoDims
-  after: string
-  afterDims: PhotoDims
-  alt: string
-}
-
+// No treatment-result photos on these cards. MAB/KKM advertising rules forbid
+// before/after patient imagery on a clinic site, with or without consent.
 type CardConfig = {
   key: string
   tabLabel: string
   title: string
   highlight?: string
-  photos: CardPhotos
   rows: PriceRow[]
   note?: string
   waMsg: string
@@ -52,13 +31,6 @@ const cards: CardConfig[] = [
     tabLabel: 'Braces',
     title: 'Braces & Orthodontics',
     highlight: 'Dari RM150/bulan',
-    photos: {
-      before: bracesBefore,
-      beforeDims: { w: 893, h: 315 },
-      after: bracesAfter,
-      afterDims: { w: 922, h: 441 },
-      alt: 'Braces',
-    },
     rows: [
       { label: 'Conventional (pelajar RM3,999 / biasa RM4,500)', price: 'RM150/bulan' },
       { label: 'Zero Depo (RM4,500)', price: 'RM200/bulan' },
@@ -70,13 +42,6 @@ const cards: CardConfig[] = [
     key: 'whitening',
     tabLabel: 'Whitening',
     title: 'Teeth Whitening',
-    photos: {
-      before: whiteningBefore,
-      beforeDims: { w: 434, h: 140 },
-      after: whiteningAfter,
-      afterDims: { w: 448, h: 197 },
-      alt: 'Teeth whitening',
-    },
     rows: [
       { label: 'Express (1 cycle)', price: 'RM299' },
       { label: 'Premium (2 cycle)', price: 'RM450' },
@@ -89,13 +54,6 @@ const cards: CardConfig[] = [
     key: 'veneer',
     tabLabel: 'Veneer',
     title: 'Veneers',
-    photos: {
-      before: veneerBefore,
-      beforeDims: { w: 437, h: 149 },
-      after: veneerAfter,
-      afterDims: { w: 451, h: 193 },
-      alt: 'Veneer',
-    },
     rows: [
       { label: 'Composite', price: 'RM300 - RM350/unit' },
       { label: 'Porcelain', price: 'RM1,000 - RM1,500/unit' },
@@ -107,13 +65,6 @@ const cards: CardConfig[] = [
     key: 'crown',
     tabLabel: 'Crown',
     title: 'Zirconia Crowns & Bridges Onlay',
-    photos: {
-      before: crownBefore,
-      beforeDims: { w: 435, h: 159 },
-      after: crownAfter,
-      afterDims: { w: 442, h: 202 },
-      alt: 'Crown gigi',
-    },
     rows: [
       { label: 'Porcelain', price: 'RM1,200/unit' },
       { label: 'Zirconia', price: 'RM1,200/unit' },
@@ -126,13 +77,6 @@ const cards: CardConfig[] = [
     key: 'scaling',
     tabLabel: 'Rawatan Asas',
     title: 'Scaling & Rawatan Asas',
-    photos: {
-      before: scalingBefore,
-      beforeDims: { w: 447, h: 159 },
-      after: scalingAfter,
-      afterDims: { w: 454, h: 187 },
-      alt: 'Scaling',
-    },
     rows: [
       { label: 'Scaling', price: 'Dari RM120' },
       { label: 'Consultation', price: 'RM50' },
@@ -151,37 +95,8 @@ function TreatmentPanel({ card, panelRef }: { card: CardConfig; panelRef: (el: H
     <div
       ref={panelRef}
       data-panel-key={card.key}
-      className={`${PANEL_WIDTH} flex-shrink-0 snap-center rounded-3xl border border-gray-100 shadow-sm bg-white overflow-hidden flex flex-col min-h-[540px] sm:min-h-[500px]`}
+      className={`${PANEL_WIDTH} flex-shrink-0 snap-center rounded-3xl border border-gray-100 shadow-sm bg-white overflow-hidden flex flex-col min-h-[380px] sm:min-h-[360px]`}
     >
-      <div className="flex-shrink-0">
-        <div className="relative bg-[#FDF0F7]">
-          <img
-            src={card.photos.before}
-            alt={`${card.photos.alt} sebelum`}
-            width={card.photos.beforeDims.w}
-            height={card.photos.beforeDims.h}
-            loading="lazy"
-            className="block w-full h-auto"
-          />
-          <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-2 py-1 rounded-full">
-            Sebelum
-          </span>
-        </div>
-        <div className="relative bg-[#FDF0F7]">
-          <img
-            src={card.photos.after}
-            alt={`${card.photos.alt} selepas`}
-            width={card.photos.afterDims.w}
-            height={card.photos.afterDims.h}
-            loading="lazy"
-            className="block w-full h-auto"
-          />
-          <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-[#E23E8F] text-white px-2 py-1 rounded-full">
-            Selepas
-          </span>
-        </div>
-      </div>
-
       <div className="p-6 sm:p-7 flex flex-col gap-4 flex-1">
         <h3 className="text-lg font-bold text-[#1A1A2E]">{card.title}</h3>
 

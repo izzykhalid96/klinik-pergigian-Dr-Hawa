@@ -71,7 +71,6 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {[
                 { label: 'Services', href: '#services' },
-                { label: 'Results', href: '#results' },
                 { label: 'Reviews', href: '#reviews' },
                 { label: 'Find Us', href: '#location' },
               ].map((l) => (
@@ -125,7 +124,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+        <p className="pt-6 text-xs text-gray-500 text-center sm:text-left">
+          Website content prepared with KKM/MAB advertising guidelines in mind.
+        </p>
+
+        <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
           <span>© {year} Klinik Pergigian Dr Hawa. All rights reserved.</span>
           <a
             href={PORTFOLIO_LINK}

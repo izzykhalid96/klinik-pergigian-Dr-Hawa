@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
 import { UserCheck, Baby, Tag, Sofa } from 'lucide-react'
+import { combinedReviews, overallRating } from '../data/stats'
 
 const reasons = [
   {
@@ -41,7 +42,7 @@ export default function WhySection() {
             <span className="text-[#E23E8F]">Coming Back</span>
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            A 4.9 rating from over 400 patients is built on the small things we get right, every single visit.
+            A {overallRating} rating from {combinedReviews} patients is built on the small things we get right, every single visit.
           </p>
         </motion.div>
 

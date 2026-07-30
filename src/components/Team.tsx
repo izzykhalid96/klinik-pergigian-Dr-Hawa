@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
 import { MessageCircle, Star, ShieldCheck, HeartHandshake } from 'lucide-react'
+import { nilai, shahAlam, overallRating } from '../data/stats'
 
 const WA_LINK = 'https://wa.me/60122412034'
 
@@ -22,8 +23,11 @@ export default function Team() {
                   <Star key={i} size={20} className="fill-white text-white" />
                 ))}
               </div>
-              <div className="text-6xl font-extrabold leading-none mb-2">4.9</div>
-              <div className="text-white/80 text-sm mb-8">From 329 verified Google reviews at our Nilai HQ, plus 5.0 from 81 reviews in Shah Alam</div>
+              <div className="text-6xl font-extrabold leading-none mb-2">{overallRating}</div>
+              <div className="text-white/80 text-sm mb-8">
+                From {nilai.reviews} verified Google reviews at our Nilai HQ, plus {shahAlam.rating} from{' '}
+                {shahAlam.reviews} reviews in Shah Alam
+              </div>
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">

@@ -21,7 +21,6 @@ export default function Navbar() {
 
   const links = [
     { label: 'Services', href: '#services' },
-    { label: 'Results', href: '#results' },
     { label: 'Reviews', href: '#reviews' },
     { label: 'Find Us', href: '#location' },
   ]

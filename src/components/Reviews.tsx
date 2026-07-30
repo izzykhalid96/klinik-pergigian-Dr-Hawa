@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { Star, ExternalLink } from 'lucide-react'
 import { reviews, type Review } from '../data/reviews'
+import { nilai, shahAlam, overallRating } from '../data/stats'
 
 const GOOGLE_MAPS_LINK = 'https://maps.google.com/?cid=17167441807107617655'
 
@@ -62,14 +63,16 @@ export default function Reviews() {
 
           {/* Aggregate badge */}
           <div className="inline-flex items-center gap-4 bg-white rounded-2xl px-6 py-4 shadow-sm border border-[#E23E8F]/10 mb-5">
-            <div className="text-4xl font-extrabold text-[#1A1A2E]">4.9</div>
+            <div className="text-4xl font-extrabold text-[#1A1A2E]">{overallRating}</div>
             <div className="text-left">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} size={15} className="fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <div className="text-xs text-gray-500 mt-1">329 Google reviews in Nilai · 5.0 from 81 in Shah Alam</div>
+              <div className="text-xs text-gray-500 mt-1">
+                {nilai.reviews} Google reviews in Nilai · {shahAlam.rating} from {shahAlam.reviews} in Shah Alam
+              </div>
             </div>
           </div>
 

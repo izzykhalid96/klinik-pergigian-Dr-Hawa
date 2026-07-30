@@ -1,4 +1,4 @@
-// Real Google reviews for Klinik Pergigian Dr Hawa (Nilai HQ, 4.9 from 329 reviews).
+// Real Google reviews for Klinik Pergigian Dr Hawa. Rating figures live in ./stats.ts.
 // Pasted verbatim from the clinic's Google Maps listing. Never fabricate reviews.
 export type Review = { name: string; text: string }
 
